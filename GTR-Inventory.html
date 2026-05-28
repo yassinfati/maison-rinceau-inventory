@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GTR Inventory — Grandeur Tableware Rentals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#0c0b09;color:#f2ead8;min-height:100vh}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:rgba(201,164,85,.25);border-radius:3px}
+a{color:inherit;text-decoration:none}
+/* layout */
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid rgba(201,164,85,.1);background:rgba(12,11,9,.97);position:sticky;top:0;z-index:100}
+.logo-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:600;color:#f2ead8;letter-spacing:.02em}
+.logo-sub{font-size:10px;color:#4a4030;letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+nav button{padding:7px 15px;border-radius:6px;border:none;background:transparent;color:#7a6e5a;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .18s}
+nav button.active{background:rgba(201,164,85,.09);color:#c9a455}
+.badge{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:8px;background:#c9a455;color:#0c0b09;font-size:10px;font-weight:700;margin-left:5px}
+main{max-width:1080px;margin:0 auto;padding:28px 22px}
+/* stat cards */
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
+.sc{background:#141210;border:1px solid rgba(201,164,85,.1);border-radius:10px;padding:20px 22px;flex:1;min-width:130px}
+.sv{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:#c9a455;line-height:1.1}
+.sl{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#4a4030;margin-top:4px}
+/* card/table */
+.card{background:#141210;border:1px solid rgba(201,164,85,.09);border-radius:11px;overflow:hidden;margin-bottom:16px}
+.card-head{padding:13px 18px;border-bottom:1px solid rgba(201,164,85,.07);font-family:'Playfair Display',serif;font-size:14px;font-weight:600;color:#c9a455;letter-spacing:.02em}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#6b5f47;border-bottom:1px solid rgba(201,164,85,.12)}
+td{padding:11px 14px;font-size:13px;color:#c9bfa8;border-bottom:1px solid rgba(255,255,255,.035)}
+tr:hover td{background:rgba(201,164,85,.03)}
+/* order card */
+.oc{background:#141210;border:1px solid rgba(201,164,85,.09);border-radius:10px;padding:18px 22px;margin-bottom:10px;transition:border-color .18s}
+.oc:hover{border-color:rgba(201,164,85,.18)}
+/* inputs */
+.inp{width:100%;background:#1c1a15;border:1px solid rgba(201,164,85,.18);border-radius:7px;padding:9px 12px;color:#f2ead8;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+.inp:focus{border-color:rgba(201,164,85,.55)}
+.inp::placeholder{color:#4a4030}
+.sel{width:100%;background:#1c1a15;border:1px solid rgba(201,164,85,.18);border-radius:7px;padding:9px 12px;color:#f2ead8;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;appearance:none;cursor:pointer;transition:border-color .2s}
+.sel:focus{border-color:rgba(201,164,85,.55)}
+/* buttons */
+.btn{padding:8px 18px;border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .18s;border:none}
+.btn-g{background:linear-gradient(135deg,#c9a455,#956e25);color:#0c0b09;font-weight:600}
+.btn-g:hover{filter:brightness(1.12)}
+.btn-o{background:transparent;border:1px solid rgba(201,164,85,.22);color:#c9a455}
+.btn-o:hover{border-color:rgba(201,164,85,.55);background:rgba(201,164,85,.06)}
+.btn-d{background:transparent;border:1px solid rgba(248,113,113,.25);color:#f87171}
+.btn-d:hover{background:rgba(248,113,113,.07)}
+.btn-sm{padding:5px 12px;font-size:12px}
+/* pills */
+.pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid rgba(201,164,85,.14);background:transparent;color:#7a6e5a;transition:all .18s;font-family:'DM Sans',sans-serif}
+.pill.on{background:rgba(201,164,85,.11);color:#c9a455;border-color:rgba(201,164,85,.38)}
+.pill:hover:not(.on){color:#c9bfa8;border-color:rgba(201,164,85,.24)}
+/* chips */
+.chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;backdrop-filter:blur(5px)}
+.modal{background:#161310;border:1px solid rgba(201,164,85,.18);border-radius:13px;width:100%;max-width:520px;max-height:92vh;overflow-y:auto;padding:28px}
+.fl{margin-bottom:15px}
+.fl2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:15px}
+.fl label,.fl2 label{display:block;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#6b5f47;margin-bottom:5px}
+.err{color:#f87171;font-size:12px;padding:8px 12px;background:rgba(248,113,113,.07);border-radius:6px;margin-bottom:12px}
+/* bar */
+.bar-wrap{flex:1;background:rgba(255,255,255,.06);border-radius:4px;height:5px;overflow:hidden;min-width:70px}
+.bar-fill{background:linear-gradient(90deg,#c9a455,#8a6018);height:100%;border-radius:4px;transition:width .3s}
+/* divider */
+hr{border:none;border-top:1px solid rgba(201,164,85,.07);margin:20px 0}
+/* page title */
+.pt{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#f2ead8;margin-bottom:3px}
+.ps{font-size:13px;color:#4a4030}
+.item-row{display:flex;align-items:center;gap:7px;margin-bottom:7px}
+.mono{font-family:monospace;font-size:11px;color:#6b5f47}
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:11px">
+    <span style="font-size:20px;color:#c9a455">✦</span>
+    <div>
+      <div class="logo-name">Grandeur Tableware</div>
+      <div class="logo-sub">Inventory Management</div>
+    </div>
+  </div>
+  <nav>
+    <button class="active" onclick="showTab('dashboard')">Dashboard</button>
+    <button onclick="showTab('inventory')">Inventory</button>
+    <button onclick="showTab('orders')" id="orders-btn">Orders</button>
+  </nav>
+</header>
+
+<main>
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard">
+    <div style="margin-bottom:24px">
+      <h1 class="pt">Overview</h1>
+      <p class="ps" id="today-date"></p>
+    </div>
+    <div class="stats" id="stat-cards"></div>
+    <div class="card">
+      <div class="card-head">Category Breakdown</div>
+      <table>
+        <thead><tr><th>Category</th><th>Total</th><th>Available</th><th>Rented</th><th>Damaged</th><th>Utilization</th></tr></thead>
+        <tbody id="cat-table"></tbody>
+      </table>
+    </div>
+    <div class="card" id="recent-orders-card" style="display:none">
+      <div class="card-head">Recent Orders</div>
+      <table>
+        <thead><tr><th>Order ID</th><th>Client</th><th>Event Date</th><th>Items</th><th>Status</th></tr></thead>
+        <tbody id="recent-orders-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- INVENTORY -->
+  <div id="tab-inventory" style="display:none">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px">
+      <div>
+        <h1 class="pt">Inventory</h1>
+        <p class="ps" id="inv-subtitle"></p>
+      </div>
+      <button class="btn btn-g" onclick="openAddItem()">+ Add Item</button>
+    </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px" id="cat-pills"></div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Catalogue ID</th><th>Item Name</th><th>Category</th><th>Total</th><th>Available</th><th>Rented</th><th>Damaged</th><th>Grade</th><th></th></tr></thead>
+        <tbody id="inv-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ORDERS -->
+  <div id="tab-orders" style="display:none">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px">
+      <div>
+        <h1 class="pt">Orders</h1>
+        <p class="ps" id="orders-subtitle"></p>
+      </div>
+      <button class="btn btn-g" onclick="openNewOrder()">+ New Order</button>
+    </div>
+    <div id="orders-list"></div>
+  </div>
+</main>
+
+<!-- ITEM MODAL -->
+<div class="overlay" id="item-modal" style="display:none" onclick="if(event.target===this)closeItemModal()">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px">
+      <h2 id="item-modal-title" style="font-family:'Playfair Display',serif;font-size:19px;color:#f2ead8"></h2>
+      <button onclick="closeItemModal()" style="background:none;border:none;color:#6b5f47;font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <div class="fl2">
+      <div><label>Catalogue ID</label><input class="inp" id="f-catId" placeholder="GTR-TAB-ART-001"></div>
+      <div><label>Category</label><select class="sel" id="f-cat"></select></div>
+    </div>
+    <div class="fl"><label>Item Name</label><input class="inp" id="f-name" placeholder="e.g. White Bone China Dinner Plate"></div>
+    <div class="fl2">
+      <div><label>Total Quantity</label><input class="inp" type="number" min="0" id="f-total"></div>
+      <div><label>Damaged Units</label><input class="inp" type="number" min="0" id="f-damaged"></div>
+    </div>
+    <div class="fl"><label>Condition Grade</label><select class="sel" id="f-grade"></select></div>
+    <input type="hidden" id="f-id">
+    <input type="hidden" id="f-rented">
+    <div style="display:flex;gap:9px;justify-content:flex-end;margin-top:6px">
+      <button class="btn btn-o" onclick="closeItemModal()">Cancel</button>
+      <button class="btn btn-g" onclick="saveItem()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER MODAL -->
+<div class="overlay" id="order-modal" style="display:none" onclick="if(event.target===this)closeOrderModal()">
+  <div class="modal" style="max-width:540px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:22px">
+      <h2 style="font-family:'Playfair Display',serif;font-size:19px;color:#f2ead8">New Rental Order</h2>
+      <button onclick="closeOrderModal()" style="background:none;border:none;color:#6b5f47;font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <div class="fl"><label>Client Name</label><input class="inp" id="o-client" placeholder="Client or company name"></div>
+    <div class="fl2">
+      <div><label>Event Name (optional)</label><input class="inp" id="o-event" placeholder="e.g. Wedding Reception"></div>
+      <div><label>Event Date</label><input class="inp" type="date" id="o-date"></div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
+        <label style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#6b5f47">Items</label>
+        <button class="btn btn-o btn-sm" onclick="addOrderLine()">+ Add Line</button>
+      </div>
+      <div id="order-lines"></div>
+    </div>
+    <div class="err" id="order-err" style="display:none"></div>
+    <div style="display:flex;gap:9px;justify-content:flex-end;margin-top:12px">
+      <button class="btn btn-o" onclick="closeOrderModal()">Cancel</button>
+      <button class="btn btn-g" onclick="saveOrder()">Create Order</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATS = ["Tableware","Cutlery","Glassware","Chairs","Tables","Linens"];
+const GRADES = {
+  A:{label:"Pristine",  c:"#4ade80"},
+  B:{label:"Excellent", c:"#a3e635"},
+  C:{label:"Good",      c:"#fbbf24"},
+  D:{label:"Fair",      c:"#fb923c"},
+  E:{label:"Poor",      c:"#f87171"},
+};
+const STATUS = {
+  Active:   {c:"#4ade80",bg:"rgba(74,222,128,0.12)"},
+  Returned: {c:"#94a3b8",bg:"rgba(148,163,184,0.10)"},
+  Cancelled:{c:"#f87171",bg:"rgba(248,113,113,0.10)"},
+};
+
+let items = [
+  {id:1,  catId:"GTR-TAB-ART-001", name:"White Bone China Dinner Plate",   cat:"Tableware", total:200, rented:0, damaged:5,  grade:"A"},
+  {id:2,  catId:"GTR-TAB-ART-002", name:"Art Deco Soup Bowl",              cat:"Tableware", total:120, rented:0, damaged:2,  grade:"A"},
+  {id:3,  catId:"GTR-CUT-ART-001", name:"Sterling Silver Dinner Fork",      cat:"Cutlery",  total:300, rented:0, damaged:3,  grade:"A"},
+  {id:4,  catId:"GTR-CUT-ART-002", name:"Sterling Silver Dinner Knife",     cat:"Cutlery",  total:300, rented:0, damaged:1,  grade:"A"},
+  {id:5,  catId:"GTR-GLS-ART-001", name:"Crystal Bordeaux Wine Glass",      cat:"Glassware",total:250, rented:0, damaged:8,  grade:"B"},
+  {id:6,  catId:"GTR-GLS-ART-002", name:"Champagne Flute — Crystal",       cat:"Glassware",total:180, rented:0, damaged:4,  grade:"A"},
+  {id:7,  catId:"GTR-CHR-MOD-001", name:"Gold Chiavari Chair",              cat:"Chairs",   total:150, rented:0, damaged:3,  grade:"A"},
+  {id:8,  catId:"GTR-CHR-MOD-002", name:"White Ghost Chair",                cat:"Chairs",   total:80,  rented:0, damaged:0,  grade:"A"},
+  {id:9,  catId:"GTR-TBL-MOD-001", name:"Round Banquet Table (180cm)",      cat:"Tables",   total:40,  rented:0, damaged:1,  grade:"A"},
+  {id:10, catId:"GTR-TBL-MOD-002", name:"Rectangular Table (240cm)",        cat:"Tables",   total:25,  rented:0, damaged:0,  grade:"A"},
+  {id:11, catId:"GTR-LIN-ART-001", name:"Ivory Damask Tablecloth (180cm)",  cat:"Linens",   total:80,  rented:0, damaged:4,  grade:"B"},
+  {id:12, catId:"GTR-LIN-ART-002", name:"Champagne Satin Table Runner",     cat:"Linens",   total:120, rented:0, damaged:2,  grade:"A"},
+];
+let orders = [];
+let nextId = 20;
+let nextOrderNum = 0;
+let catFilter = "All";
+let currentTab = "dashboard";
+
+function avail(item){ return Math.max(0, item.total - item.rented - item.damaged); }
+
+// ── Tab switching ─────────────────────────────────────────────────
+function showTab(name){
+  currentTab = name;
+  ["dashboard","inventory","orders"].forEach(t=>{
+    document.getElementById("tab-"+t).style.display = t===name?"block":"none";
+  });
+  document.querySelectorAll("nav button").forEach((b,i)=>{
+    b.classList.toggle("active", ["dashboard","inventory","orders"][i]===name);
+  });
+  if(name==="dashboard") renderDashboard();
+  if(name==="inventory") renderInventory();
+  if(name==="orders")    renderOrders();
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────
+function renderDashboard(){
+  document.getElementById("today-date").textContent =
+    new Date().toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  const total    = items.reduce((s,i)=>s+i.total,0);
+  const rented   = items.reduce((s,i)=>s+i.rented,0);
+  const damaged  = items.reduce((s,i)=>s+i.damaged,0);
+  const available= items.reduce((s,i)=>s+avail(i),0);
+  const active   = orders.filter(o=>o.status==="Active").length;
+  const defs = [
+    {v:items.length, l:"Catalogue SKUs"},
+    {v:total,        l:"Total Units"},
+    {v:available,    l:"Available",  col:available>0?"#4ade80":"#f87171"},
+    {v:rented,       l:"Currently Rented", col:"#c9a455"},
+    {v:active,       l:"Active Orders",    col:"#c9a455"},
+    {v:damaged,      l:"Damaged Units",    col:damaged>0?"#fb923c":"#4a4030"},
+  ];
+  document.getElementById("stat-cards").innerHTML = defs.map(d=>
+    `<div class="sc"><div class="sv" style="${d.col?`color:${d.col}`:""}">${d.v}</div><div class="sl">${d.l}</div></div>`
+  ).join("");
+
+  const cats = CATS.map(cat=>{
+    const rows = items.filter(i=>i.cat===cat);
+    const tot  = rows.reduce((s,i)=>s+i.total,0);
+    const ren  = rows.reduce((s,i)=>s+i.rented,0);
+    const dam  = rows.reduce((s,i)=>s+i.damaged,0);
+    return {cat, tot, ren, dam, av:tot-ren-dam};
+  }).filter(c=>c.tot>0);
+
+  document.getElementById("cat-table").innerHTML = cats.map(c=>{
+    const pct = c.tot ? Math.round(c.ren/c.tot*100) : 0;
+    return `<tr>
+      <td style="color:#f2ead8;font-weight:500">${c.cat}</td>
+      <td>${c.tot}</td>
+      <td style="color:${c.av===0?"#f87171":"#4ade80"}">${c.av}</td>
+      <td style="color:#c9a455">${c.ren}</td>
+      <td style="color:${c.dam>0?"#fb923c":"#4a4030"}">${c.dam}</td>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div>
+        <span style="font-size:11px;color:#6b5f47;min-width:30px">${pct}%</span>
+      </div></td>
+    </tr>`;
+  }).join("");
+
+  const rc = document.getElementById("recent-orders-card");
+  if(orders.length===0){ rc.style.display="none"; return; }
+  rc.style.display="block";
+  const recent = [...orders].reverse().slice(0,6);
+  document.getElementById("recent-orders-body").innerHTML = recent.map(o=>{
+    const m = STATUS[o.status];
+    return `<tr>
+      <td class="mono">${o.id}</td>
+      <td style="color:#f2ead8;font-weight:500">${o.client}</td>
+      <td>${o.date}</td>
+      <td style="color:#8a7d65">${o.lines.length} line${o.lines.length!==1?"s":""}</td>
+      <td><span class="chip" style="background:${m.bg};color:${m.c}">${o.status}</span></td>
+    </tr>`;
+  }).join("");
+}
+
+// ── Inventory ─────────────────────────────────────────────────────
+function renderInventory(){
+  // pills
+  const pillsEl = document.getElementById("cat-pills");
+  pillsEl.innerHTML = ["All",...CATS].map(c=>
+    `<button class="pill${catFilter===c?" on":""}" onclick="setCat('${c}')">${c}</button>`
+  ).join("");
+
+  const filtered = catFilter==="All" ? items : items.filter(i=>i.cat===catFilter);
+  document.getElementById("inv-subtitle").textContent =
+    `${filtered.length} items · ${filtered.reduce((s,i)=>s+i.total,0)} total units`;
+
+  document.getElementById("inv-table").innerHTML = filtered.map(item=>{
+    const av = avail(item);
+    const g = GRADES[item.grade];
+    return `<tr>
+      <td class="mono">${item.catId}</td>
+      <td style="color:#f2ead8;font-weight:500">${item.name}</td>
+      <td style="font-size:12px;color:#7a6e5a">${item.cat}</td>
+      <td>${item.total}</td>
+      <td style="color:${av===0?"#f87171":"#4ade80"};font-weight:600">${av}</td>
+      <td style="color:#c9a455">${item.rented}</td>
+      <td style="color:${item.damaged>0?"#fb923c":"#4a4030"}">${item.damaged}</td>
+      <td><span class="chip" style="background:${g.c}1a;color:${g.c}">${item.grade} · ${g.label}</span></td>
+      <td><button class="btn btn-o btn-sm" onclick="openEditItem(${item.id})">Edit</button></td>
+    </tr>`;
+  }).join("");
+}
+function setCat(c){ catFilter=c; renderInventory(); }
+
+// ── Orders ────────────────────────────────────────────────────────
+function renderOrders(){
+  const active = orders.filter(o=>o.status==="Active").length;
+  document.getElementById("orders-subtitle").textContent =
+    `${orders.length} total · ${active} active`;
+  const el = document.getElementById("orders-list");
+  if(orders.length===0){
+    el.innerHTML=`<div class="card" style="text-align:center;padding:60px 20px;color:#4a4030">No orders yet. Create your first rental order.</div>`;
+    return;
+  }
+  el.innerHTML = [...orders].reverse().map(o=>{
+    const m = STATUS[o.status];
+    const itemsHtml = o.lines.map(ln=>{
+      const it = items.find(i=>i.id===ln.id);
+      return it ? `<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:5px 11px;font-size:12px">
+        <span style="color:#c9bfa8">${it.name}</span>
+        <span style="color:#c9a455;margin-left:5px;font-weight:600">×${ln.qty}</span>
+      </div>` : "";
+    }).join("");
+    const btns = o.status==="Active" ? `
+      <button class="btn btn-o btn-sm" onclick="changeStatus('${o.id}','Returned')">Mark Returned</button>
+      <button class="btn btn-d btn-sm" onclick="changeStatus('${o.id}','Cancelled')">Cancel</button>
+    ` : "";
+    return `<div class="oc">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:5px">
+            <span class="mono">${o.id}</span>
+            <span class="chip" style="background:${m.bg};color:${m.c}">${o.status}</span>
+          </div>
+          <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:#f2ead8">${o.client}</div>
+          ${o.event?`<div style="font-size:12px;color:#7a6e5a;margin-top:2px">${o.event}</div>`:""}
+          <div style="font-size:12px;color:#4a4030;margin-top:4px">Event: ${o.date} · Created: ${o.created}</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0">${btns}</div>
+      </div>
+      <div style="margin-top:14px;padding-top:13px;border-top:1px solid rgba(255,255,255,.04)">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#4a4030;margin-bottom:9px">Items</div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px">${itemsHtml}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ── Item Modal ────────────────────────────────────────────────────
+function openAddItem(){
+  document.getElementById("item-modal-title").textContent = "Add New Item";
+  document.getElementById("f-id").value = "";
+  document.getElementById("f-rented").value = "0";
+  document.getElementById("f-catId").value = "";
+  document.getElementById("f-name").value = "";
+  document.getElementById("f-total").value = "";
+  document.getElementById("f-damaged").value = "0";
+  populateCatSel(); populateGradeSel();
+  document.getElementById("item-modal").style.display = "flex";
+}
+function openEditItem(id){
+  const item = items.find(i=>i.id===id);
+  if(!item) return;
+  document.getElementById("item-modal-title").textContent = "Edit Item";
+  document.getElementById("f-id").value = id;
+  document.getElementById("f-rented").value = item.rented;
+  document.getElementById("f-catId").value = item.catId;
+  document.getElementById("f-name").value = item.name;
+  document.getElementById("f-total").value = item.total;
+  document.getElementById("f-damaged").value = item.damaged;
+  populateCatSel(item.cat); populateGradeSel(item.grade);
+  document.getElementById("item-modal").style.display = "flex";
+}
+function populateCatSel(sel=""){
+  document.getElementById("f-cat").innerHTML = CATS.map(c=>
+    `<option value="${c}"${c===sel?" selected":""}>${c}</option>`).join("");
+}
+function populateGradeSel(sel="A"){
+  document.getElementById("f-grade").innerHTML = Object.entries(GRADES).map(([k,v])=>
+    `<option value="${k}"${k===sel?" selected":""}>${k} — ${v.label}</option>`).join("");
+}
+function closeItemModal(){ document.getElementById("item-modal").style.display="none"; }
+function saveItem(){
+  const id      = document.getElementById("f-id").value;
+  const catId   = document.getElementById("f-catId").value.trim();
+  const name    = document.getElementById("f-name").value.trim();
+  const cat     = document.getElementById("f-cat").value;
+  const total   = parseInt(document.getElementById("f-total").value)||0;
+  const damaged = parseInt(document.getElementById("f-damaged").value)||0;
+  const grade   = document.getElementById("f-grade").value;
+  const rented  = parseInt(document.getElementById("f-rented").value)||0;
+  if(!catId||!name||!total) return;
+  if(id){
+    items = items.map(i=>i.id===parseInt(id)?{...i,catId,name,cat,total,damaged,grade}:i);
+  } else {
+    items.push({id:++nextId,catId,name,cat,total,rented:0,damaged,grade});
+  }
+  closeItemModal();
+  renderInventory();
+  updateOrdersBadge();
+}
+
+// ── Order Modal ───────────────────────────────────────────────────
+let orderLines = [{id:"",qty:1}];
+function openNewOrder(){
+  orderLines = [{id:"",qty:1}];
+  document.getElementById("o-client").value = "";
+  document.getElementById("o-event").value = "";
+  document.getElementById("o-date").value = "";
+  document.getElementById("order-err").style.display = "none";
+  renderOrderLines();
+  document.getElementById("order-modal").style.display = "flex";
+}
+function closeOrderModal(){ document.getElementById("order-modal").style.display="none"; }
+function renderOrderLines(){
+  document.getElementById("order-lines").innerHTML = orderLines.map((ln,i)=>{
+    const opts = items.map(it=>{
+      const av = avail(it);
+      return `<option value="${it.id}"${it.id===parseInt(ln.id)?" selected":""}${av===0?" disabled":""}>${it.name} (avail: ${av})</option>`;
+    }).join("");
+    return `<div class="item-row">
+      <select class="sel" style="flex:1" onchange="setLine(${i},'id',this.value)"><option value="">— Select item —</option>${opts}</select>
+      <input class="inp" type="number" min="1" value="${ln.qty}" style="width:80px" onchange="setLine(${i},'qty',this.value)">
+      <button onclick="removeLine(${i})" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:18px;line-height:1;padding:0 4px">×</button>
+    </div>`;
+  }).join("");
+}
+function addOrderLine(){ orderLines.push({id:"",qty:1}); renderOrderLines(); }
+function removeLine(i){ orderLines.splice(i,1); renderOrderLines(); }
+function setLine(i,k,v){ orderLines[i][k]=k==="qty"?parseInt(v)||1:v; }
+function saveOrder(){
+  const client = document.getElementById("o-client").value.trim();
+  const event  = document.getElementById("o-event").value.trim();
+  const date   = document.getElementById("o-date").value;
+  const err    = document.getElementById("order-err");
+  err.style.display="none";
+  if(!client){ showErr("Client name is required."); return; }
+  if(!date)  { showErr("Event date is required."); return; }
+  const valid = orderLines.filter(l=>l.id&&l.qty>0);
+  if(!valid.length){ showErr("Add at least one item."); return; }
+  for(const ln of valid){
+    const it = items.find(i=>i.id===parseInt(ln.id));
+    if(it&&ln.qty>avail(it)){ showErr(`Not enough units for "${it.name}". Available: ${avail(it)}`); return; }
+  }
+  // deduct stock
+  valid.forEach(ln=>{
+    items = items.map(i=>i.id===parseInt(ln.id)?{...i,rented:i.rented+ln.qty}:i);
+  });
+  nextOrderNum++;
+  orders.push({
+    id:`ORD-${String(nextOrderNum).padStart(3,"0")}`,
+    client, event, date,
+    lines: valid.map(l=>({id:parseInt(l.id),qty:l.qty})),
+    status:"Active",
+    created: new Date().toLocaleDateString("fr-MA")
+  });
+  closeOrderModal();
+  updateOrdersBadge();
+  showTab("orders");
+}
+function showErr(msg){
+  const el = document.getElementById("order-err");
+  el.textContent = msg; el.style.display="block";
+}
+
+// ── Status change ─────────────────────────────────────────────────
+function changeStatus(oid, status){
+  const o = orders.find(x=>x.id===oid);
+  if(!o) return;
+  if(status!=="Active"){
+    o.lines.forEach(ln=>{
+      items = items.map(i=>i.id===ln.id?{...i,rented:Math.max(0,i.rented-ln.qty)}:i);
+    });
+  }
+  o.status = status;
+  renderOrders();
+  updateOrdersBadge();
+}
+
+// ── Badge ─────────────────────────────────────────────────────────
+function updateOrdersBadge(){
+  const n = orders.filter(o=>o.status==="Active").length;
+  const btn = document.getElementById("orders-btn");
+  const existing = btn.querySelector(".badge");
+  if(existing) existing.remove();
+  if(n>0) btn.insertAdjacentHTML("beforeend",`<span class="badge">${n}</span>`);
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+showTab("dashboard");
+</script>
+</body>
+</html>
